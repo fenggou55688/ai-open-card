@@ -3,30 +3,28 @@ import { simulateNextGame } from './simulateNextGame';
 
 const App = () => {
   const [rounds, setRounds] = useState([]);
-  const [bankerInput, setBankerInput] = useState('');
-  const [playerInput, setPlayerInput] = useState('');
   const [prediction, setPrediction] = useState({ 莊: 0, 閒: 0, 和: 0 });
+  const [selectedBankerCards, setSelectedBankerCards] = useState([]);
+  const [selectedPlayerCards, setSelectedPlayerCards] = useState([]);
 
-  const parseInput = (str) => {
-    return str
-      .split(',')
-      .map(s => parseInt(s.trim(), 10))
-      .filter(n => !isNaN(n) && n >= 0 && n <= 10);
+  const handleCardSelection = (cardType, cardValue) => {
+    if (cardType === 'banker') {
+      setSelectedBankerCards(prev => [...prev, cardValue]);
+    } else if (cardType === 'player') {
+      setSelectedPlayerCards(prev => [...prev, cardValue]);
+    }
   };
 
   const handleAddRound = () => {
-    const bankerCards = parseInput(bankerInput);
-    const playerCards = parseInput(playerInput);
-
-    if (bankerCards.length < 2 || bankerCards.length > 3 || playerCards.length < 2 || playerCards.length > 3) {
-      alert('請輸入 2~3 張牌，範例：9,8');
+    if (selectedBankerCards.length < 2 || selectedPlayerCards.length < 2) {
+      alert('每局必須有兩張牌！');
       return;
     }
 
-    const newRounds = [...rounds, { banker: bankerCards, player: playerCards }];
+    const newRounds = [...rounds, { banker: selectedBankerCards, player: selectedPlayerCards }];
     setRounds(newRounds);
-    setBankerInput('');
-    setPlayerInput('');
+    setSelectedBankerCards([]);
+    setSelectedPlayerCards([]);
 
     const result = simulateNextGame(newRounds, 10000);
     setPrediction(result);
@@ -42,22 +40,41 @@ const App = () => {
     return total === 0 ? '0.0' : ((count / total) * 100).toFixed(1);
   };
 
+  const renderCardButtons = (cardType) => {
+    const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    return (
+      <div>
+        {cards.map((card) => (
+          <button
+            key={card}
+            onClick={() => handleCardSelection(cardType, card)}
+            style={{ margin: '0.5rem', padding: '0.5rem 1rem' }}
+          >
+            {card}
+          </button>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div style={{ padding: '2rem', fontFamily: 'Arial' }}>
       <h1>🔍 AI 精準百家樂預測</h1>
       <p>根據你輸入的每局實際發牌結果模擬 10000 次預測下一局</p>
 
       <div style={{ marginBottom: '1rem' }}>
-        <div>
-          <label>莊牌（用 , 分隔）：</label>
-          <input value={bankerInput} onChange={(e) => setBankerInput(e.target.value)} placeholder="例如：9,8" />
-        </div>
-        <div>
-          <label>閒牌（用 , 分隔）：</label>
-          <input value={playerInput} onChange={(e) => setPlayerInput(e.target.value)} placeholder="例如：4,1,10" />
-        </div>
-        <button onClick={handleAddRound} style={{ marginTop: '0.5rem' }}>加入此局結果</button>
-        <button onClick={handleClear} style={{ marginLeft: '1rem' }}>清除所有紀錄</button>
+        <h3>選擇莊牌</h3>
+        {renderCardButtons('banker')}
+
+        <h3>選擇閒牌</h3>
+        {renderCardButtons('player')}
+
+        <button onClick={handleAddRound} style={{ marginTop: '1rem' }}>
+          加入此局結果
+        </button>
+        <button onClick={handleClear} style={{ marginLeft: '1rem' }}>
+          清除所有紀錄
+        </button>
       </div>
 
       <div>
