@@ -1,116 +1,78 @@
-import React, { useState } from 'react';
-
-const suits = ['♠️', '♥️', '♦️', '♣️'];
-const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-
-const getCardValue = (value) => {
-  if (['J', 'Q', 'K', '10'].includes(value)) return 0;
-  if (value === 'A') return 1;
-  return parseInt(value);
-};
-
-const generateDeck = () => {
-  let deck = [];
-  for (let i = 0; i < 8; i++) {
-    for (let suit of suits) {
-      for (let value of values) {
-        deck.push({ suit, value });
-      }
-    }
-  }
-  return shuffle(deck);
-};
-
-const shuffle = (deck) => {
-  for (let i = deck.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [deck[i], deck[j]] = [deck[j], deck[i]];
-  }
-  return deck;
-};
-
-const calculatePoints = (cards) => {
-  const total = cards.reduce((sum, card) => sum + getCardValue(card.value), 0);
-  return total % 10;
-};
-
-const dealGame = (shoe) => {
-  let newShoe = [...shoe];
-  const playerCards = [newShoe.pop(), newShoe.pop()];
-  const bankerCards = [newShoe.pop(), newShoe.pop()];
-
-  const playerPoints = calculatePoints(playerCards);
-  const bankerPoints = calculatePoints(bankerCards);
-
-  if (playerPoints <= 5) {
-    playerCards.push(newShoe.pop());
-  }
-
-  if (bankerPoints <= 5) {
-    bankerCards.push(newShoe.pop());
-  }
-
-  const finalPlayer = calculatePoints(playerCards);
-  const finalBanker = calculatePoints(bankerCards);
-
-  let winner = '和';
-  if (finalPlayer > finalBanker) winner = '閒';
-  else if (finalBanker > finalPlayer) winner = '莊';
-
-  return {
-    shoe: newShoe,
-    result: winner,
-    playerCards,
-    bankerCards,
-    finalPlayer,
-    finalBanker,
-  };
-};
-
-const simulateNextGame = (shoe) => {
-  let results = { '莊': 0, '閒': 0, '和': 0 };
-  for (let i = 0; i < 100; i++) {
-    let copy = [...shoe];
-    let game = dealGame(copy);
-    results[game.result]++;
-  }
-  return results;
-};
+import React, { useState, useEffect } from 'react';
+import { generateHistoryData } from './historyData';
 
 const App = () => {
-  const [shoe, setShoe] = useState(generateDeck());
-  const [history, setHistory] = useState([]);
-  const [prediction, setPrediction] = useState({ '莊': 0, '閒': 0, '和': 0 });
+  const [inputHistory, setInputHistory] = useState([]);
+  const [prediction, setPrediction] = useState({ 莊: 0, 閒: 0, 和: 0 });
+  const [matchedCount, setMatchedCount] = useState(0);
+  const [historyData, setHistoryData] = useState([]);
 
-  const playGame = () => {
-    const result = dealGame(shoe);
-    setShoe(result.shoe);
-    setHistory([...history, result.result]);
-    const next = simulateNextGame(result.shoe);
-    setPrediction(next);
+  useEffect(() => {
+    // 初次進入時產生模擬歷史資料
+    const data = generateHistoryData();
+    setHistoryData(data);
+  }, []);
+
+  const handleInput = (value) => {
+    const newHistory = [...inputHistory, value];
+    setInputHistory(newHistory);
+    calculatePrediction(newHistory);
   };
 
-  const clearGame = () => {
-    setShoe(generateDeck());
-    setHistory([]);
-    setPrediction({ '莊': 0, '閒': 0, '和': 0 });
+  const handleClear = () => {
+    setInputHistory([]);
+    setPrediction({ 莊: 0, 閒: 0, 和: 0 });
+    setMatchedCount(0);
   };
 
-  const total = prediction['莊'] + prediction['閒'] + prediction['和'];
+  const calculatePrediction = (pattern) => {
+    if (pattern.length === 0) return;
+
+    let matchResults = { 莊: 0, 閒: 0, 和: 0 };
+    let matchCount = 0;
+
+    for (let i = 0; i < historyData.length - pattern.length; i++) {
+      const slice = historyData.slice(i, i + pattern.length);
+      if (slice.join() === pattern.join()) {
+        const next = historyData[i + pattern.length];
+        if (next) {
+          matchResults[next]++;
+          matchCount++;
+        }
+      }
+    }
+
+    setPrediction(matchResults);
+    setMatchedCount(matchCount);
+  };
+
+  const getPercentage = (count) => {
+    const total = prediction.莊 + prediction.閒 + prediction.和;
+    return total === 0 ? '0.0' : ((count / total) * 100).toFixed(1);
+  };
 
   return (
-    <div className="app">
-      <h1>AI 開牌預測（真實模擬）</h1>
-      <button onClick={playGame}>模擬一局</button>
-      <button onClick={clearGame}>重置牌局</button>
+    <div style={{ padding: '2rem', fontFamily: 'Arial' }}>
+      <h1>🎴 AI 百家樂走勢預測</h1>
 
-      <h2>歷史結果：</h2>
-      <div>{history.join(' → ')}</div>
+      <div style={{ marginBottom: '1rem' }}>
+        <button onClick={() => handleInput('莊')}>莊</button>
+        <button onClick={() => handleInput('閒')}>閒</button>
+        <button onClick={() => handleInput('和')}>和</button>
+        <button onClick={handleClear} style={{ marginLeft: '1rem' }}>清除紀錄</button>
+      </div>
 
-      <h2>下一局預測：</h2>
-      <div>莊：{((prediction['莊'] / total) * 100).toFixed(1)}%</div>
-      <div>閒：{((prediction['閒'] / total) * 100).toFixed(1)}%</div>
-      <div>和：{((prediction['和'] / total) * 100).toFixed(1)}%</div>
+      <div>
+        <strong>目前走勢：</strong> {inputHistory.join(' → ') || '尚未輸入'}
+      </div>
+
+      <div style={{ marginTop: '1rem' }}>
+        <strong>比對歷史資料次數：</strong> {matchedCount}
+        <h3>🔮 下一局預測機率：</h3>
+        <div>莊：{getPercentage(prediction.莊)}%</div>
+        <div>閒：{getPercentage(prediction.閒)}%</div>
+        <div>和：{getPercentage(prediction.和)}%</div>
+      </div>
     </div>
   );
 };
