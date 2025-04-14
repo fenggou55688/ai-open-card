@@ -27,7 +27,7 @@ const App = () => {
 
   // 更新：允許最多 5 局的偏差
   const calculatePrediction = (pattern) => {
-    if (pattern.length === 5) return;
+    if (pattern.length === 0) return;
 
     let matchResults = { 莊: 0, 閒: 0, 和: 0 };
     let matchCount = 0;
@@ -42,7 +42,7 @@ const App = () => {
       }
 
       // 如果 mismatched count 小於等於 5，則視為相似的走勢
-      if (mismatchCount <= 10) {
+      if (mismatchCount <= 5) {
         const next = historyData[i + pattern.length];
         if (next) {
           matchResults[next]++;
