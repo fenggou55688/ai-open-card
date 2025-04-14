@@ -27,7 +27,7 @@ const App = () => {
 
   // 更新：允許最多 5 局的偏差
   const calculatePrediction = (pattern) => {
-    if (pattern.length === 0) return;
+    if (pattern.length === 5) return;
 
     let matchResults = { 莊: 0, 閒: 0, 和: 0 };
     let matchCount = 0;
