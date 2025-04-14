@@ -1,7 +1,7 @@
 // 模擬 5000 局歷史結果
 const outcomes = ['莊', '閒', '和'];
 
-export const generateHistoryData = (length = 5000) => {
+export const generateHistoryData = (length = 50000) => {
   const history = [];
   for (let i = 0; i < length; i++) {
     const rand = Math.random();
