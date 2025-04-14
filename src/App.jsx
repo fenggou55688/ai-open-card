@@ -42,7 +42,7 @@ const App = () => {
       }
 
       // 如果 mismatched count 小於等於 5，則視為相似的走勢
-      if (mismatchCount <= 1) {
+      if (mismatchCount <= 3) {
         const next = historyData[i + pattern.length];
         if (next) {
           matchResults[next]++;
