@@ -25,7 +25,7 @@ const App = () => {
   return (
     <div style={{ padding: '2rem', fontFamily: 'Arial' }}>
       <h1>🎴 AI 開牌預測</h1>
-      <p>根據真實百家樂規則模擬 10000 次預測下一局</p>
+      <p>根據真實百家樂規則模擬 10 次預測下一局</p>
 
       <div style={{ marginBottom: '1rem' }}>
         <button onClick={() => handleInput('莊')}>莊</button>
