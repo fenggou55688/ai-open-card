@@ -25,6 +25,7 @@ const App = () => {
     setMatchedCount(0);
   };
 
+  // 更新：允許最多 5 局的偏差
   const calculatePrediction = (pattern) => {
     if (pattern.length === 0) return;
 
@@ -33,7 +34,15 @@ const App = () => {
 
     for (let i = 0; i < historyData.length - pattern.length; i++) {
       const slice = historyData.slice(i, i + pattern.length);
-      if (slice.join() === pattern.join()) {
+      let mismatchCount = 0;
+
+      // 檢查這個走勢中有多少場與當前輸入的走勢不同
+      for (let j = 0; j < pattern.length; j++) {
+        if (slice[j] !== pattern[j]) mismatchCount++;
+      }
+
+      // 如果 mismatched count 小於等於 5，則視為相似的走勢
+      if (mismatchCount <= 5) {
         const next = historyData[i + pattern.length];
         if (next) {
           matchResults[next]++;
