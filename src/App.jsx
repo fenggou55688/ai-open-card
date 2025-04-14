@@ -88,12 +88,4 @@ const App = () => {
 
       <div style={{ marginTop: '1rem' }}>
         <h3>📊 下一局預測機率：</h3>
-        <div>莊：{getPercentage(prediction.莊)}%</div>
-        <div>閒：{getPercentage(prediction.閒)}%</div>
-        <div>和：{getPercentage(prediction.和)}%</div>
-      </div>
-    </div>
-  );
-};
-
-export default App;
+        <div>莊：{getPercentage
