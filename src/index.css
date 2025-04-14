@@ -1,4 +1,3 @@
-
 body {
   font-family: sans-serif;
   background: #f9f9f9;
@@ -28,4 +27,12 @@ body {
 
 .buttons button:hover {
   background-color: #2980b9;
+}
+
+.roadmap {
+  margin-top: 2rem;
+}
+
+.roadmap div {
+  margin: 0.5rem 0;
 }
