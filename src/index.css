@@ -1,7 +1,6 @@
 body {
-  font-family: sans-serif;
-  background: #f9f9f9;
-  color: #333;
+  font-family: 'Arial', sans-serif;
+  background-color: #f8f9fa;
   padding: 2rem;
 }
 
@@ -14,25 +13,17 @@ body {
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-.buttons button {
+button {
   margin: 0.5rem;
-  padding: 0.5rem 1.2rem;
-  font-size: 1.1rem;
-  border-radius: 0.5rem;
-  border: none;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
   background-color: #3498db;
+  border: none;
+  border-radius: 0.5rem;
   color: white;
   cursor: pointer;
 }
 
-.buttons button:hover {
+button:hover {
   background-color: #2980b9;
-}
-
-.roadmap {
-  margin-top: 2rem;
-}
-
-.roadmap div {
-  margin: 0.5rem 0;
 }
