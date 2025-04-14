@@ -79,7 +79,7 @@ function simulateOneGame(deck) {
   return '和';
 }
 
-export function simulateNextGame(history, simulations = 10000) {
+export function simulateNextGame(history, simulations = 100000) {
   const resultCount = { 莊: 0, 閒: 0, 和: 0 };
 
   for (let i = 0; i < simulations; i++) {
