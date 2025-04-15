@@ -1,12 +1,10 @@
 // simulateNextGame.js
 
-// 計算點數（A = 1，JQK = 0）
 function totalPoints(cards) {
   const sum = cards.reduce((acc, card) => acc + Math.min(card, 10), 0);
   return sum % 10;
 }
 
-// 模擬一局百家樂
 function simulateOneGame(deck) {
   const player = [deck.pop(), deck.pop()];
   const banker = [deck.pop(), deck.pop()];
@@ -42,15 +40,14 @@ function simulateOneGame(deck) {
 
   if (playerPoints > bankerPoints) return '閒';
   if (bankerPoints > playerPoints) return '莊';
-  return '和';
+  return null; // 和局忽略
 }
 
-// 主模擬函數
 export function simulateNextGame(rounds, times) {
-  const result = { 莊: 0, 閒: 0, 和: 0 };
+  const result = { 莊: 0, 閒: 0 };
 
   for (let i = 0; i < times; i++) {
-    // 建立一副牌（8 副）
+    // 建立 8 副牌
     let deck = [];
     for (let j = 0; j < 8 * 52; j++) {
       let point = (j % 13) + 1;
@@ -63,7 +60,7 @@ export function simulateNextGame(rounds, times) {
       [deck[k], deck[r]] = [deck[r], deck[k]];
     }
 
-    // 扣除歷史牌
+    // 扣除歷史出現的牌
     rounds.forEach((round) => {
       [...round.banker, ...round.player].forEach((card) => {
         const index = deck.indexOf(card);
@@ -71,9 +68,9 @@ export function simulateNextGame(rounds, times) {
       });
     });
 
-    // 模擬一局
     const outcome = simulateOneGame(deck);
-    result[outcome]++;
+    if (outcome) result[outcome]++;
+    // 如果 outcome 是 null（和局），就跳過不統計
   }
 
   return result;
